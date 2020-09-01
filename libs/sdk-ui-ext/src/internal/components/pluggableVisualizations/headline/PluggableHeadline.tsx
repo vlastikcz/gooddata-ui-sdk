@@ -115,6 +115,10 @@ export class PluggableHeadline extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
+    public convertOnDrill(sourceVisualization: any, _drillConfig: any) {
+        return sourceVisualization;
+    }
+
     protected checkBeforeRender(insight: IInsightDefinition): boolean {
         super.checkBeforeRender(insight);
 

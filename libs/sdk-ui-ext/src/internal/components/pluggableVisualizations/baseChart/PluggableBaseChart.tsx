@@ -70,6 +70,7 @@ import get from "lodash/get";
 import isEmpty from "lodash/isEmpty";
 import set from "lodash/set";
 import tail from "lodash/tail";
+import { removeAttributesFromBuckets } from "../convertUtil";
 
 export class PluggableBaseChart extends AbstractPluggableVisualization {
     protected projectId: string;
@@ -135,6 +136,10 @@ export class PluggableBaseChart extends AbstractPluggableVisualization {
         newReferencePoint = removeSort(newReferencePoint);
 
         return Promise.resolve(sanitizeFilters(newReferencePoint));
+    }
+
+    public convertOnDrill(sourceVisualization: any, drillConfig: any) {
+        return removeAttributesFromBuckets(sourceVisualization, drillConfig).visualization;
     }
 
     public isOpenAsReportSupported(): boolean {

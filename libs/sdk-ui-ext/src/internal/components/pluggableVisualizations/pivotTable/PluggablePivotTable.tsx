@@ -1,3 +1,4 @@
+import { removeAttributesFromBuckets } from "../convertUtil";
 // (C) 2019 GoodData Corporation
 import cloneDeep from "lodash/cloneDeep";
 import flatMap from "lodash/flatMap";
@@ -75,6 +76,7 @@ import {
     adaptReferencePointSortItemsToPivotTable,
     addDefaultSort,
 } from "./sortItemsHelpers";
+import { sanitizeTableProperties } from "../convertUtil";
 
 export const getColumnAttributes = (buckets: IBucketOfFun[]): IBucketItem[] => {
     return getItemsFromBuckets(
@@ -213,6 +215,11 @@ export class PluggablePivotTable extends AbstractPluggableVisualization {
         );
 
         return Promise.resolve(sanitizeFilters(newReferencePoint));
+    }
+
+    public convertOnDrill(sourceVisualization: any, drillConfig: any) {
+        const { visualization, removed } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
+        return sanitizeTableProperties(visualization, removed);
     }
 
     private createCorePivotTableProps = () => {

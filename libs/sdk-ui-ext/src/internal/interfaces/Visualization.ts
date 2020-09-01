@@ -333,6 +333,8 @@ export interface IVisualization {
         referencePoint: IReferencePoint,
         previousReferencePoint?: IReferencePoint,
     ): Promise<IExtendedReferencePoint>;
+
+    convertOnDrill(source: any, drillConfig: any): any;
 }
 
 export interface IGdcConfig {

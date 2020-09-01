@@ -287,4 +287,6 @@ export abstract class AbstractPluggableVisualization implements IVisualization {
             return resultItems;
         }, []);
     }
+
+    public abstract convertOnDrill(sourceVisualization: any, drillConfig: any): any;
 }
