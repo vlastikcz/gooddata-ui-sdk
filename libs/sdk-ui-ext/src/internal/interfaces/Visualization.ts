@@ -4,6 +4,7 @@ import { IAnalyticalBackend, IExecutionFactory, ISettings } from "@gooddata/sdk-
 import {
     IColorPalette,
     IInsightDefinition,
+    IInsight,
     ITotal,
     VisualizationProperties,
     ObjRef,
@@ -334,7 +335,19 @@ export interface IVisualization {
         previousReferencePoint?: IReferencePoint,
     ): Promise<IExtendedReferencePoint>;
 
-    convertOnDrill(source: any, drillConfig: any): any;
+    /*
+        TODO: rename to:
+
+        modifyInsightForDrilldown(insight: IInsight, drilldownContext: IDrilldownContext)a ten context by mohol byt nieco ako:
+
+        interface IDrilldownContext {
+            drilldownConfig: typ_z_spi,
+            drillEvent: IDrillEvent,
+            drilldownAttribute: IAttribute
+        }
+     */
+
+    convertOnDrill(source: IInsight, drillConfig: any): IInsight;
 }
 
 export interface IGdcConfig {

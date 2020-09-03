@@ -14,7 +14,7 @@ import {
     PluggableVisualizationErrorCodes,
 } from "../../interfaces/Visualization";
 import { findDerivedBucketItem, hasDerivedBucketItems, isDerivedBucketItem } from "../../utils/bucketHelper";
-import { IInsightDefinition, insightHasDataDefined, insightProperties } from "@gooddata/sdk-model";
+import { IInsight, IInsightDefinition, insightHasDataDefined, insightProperties } from "@gooddata/sdk-model";
 import { IExecutionFactory } from "@gooddata/sdk-backend-spi";
 import {
     DefaultLocale,
@@ -288,5 +288,5 @@ export abstract class AbstractPluggableVisualization implements IVisualization {
         }, []);
     }
 
-    public abstract convertOnDrill(sourceVisualization: any, drillConfig: any): any;
+    public abstract convertOnDrill(sourceVisualization: IInsight, drillConfig: any): IInsight;
 }

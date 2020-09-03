@@ -1,7 +1,13 @@
 // (C) 2019 GoodData Corporation
 
 import { IExecutionFactory, ISettings, SettingCatalog } from "@gooddata/sdk-backend-spi";
-import { bucketIsEmpty, IInsightDefinition, insightBucket, insightHasDataDefined } from "@gooddata/sdk-model";
+import {
+    bucketIsEmpty,
+    IInsight,
+    IInsightDefinition,
+    insightBucket,
+    insightHasDataDefined,
+} from "@gooddata/sdk-model";
 
 import { BucketNames, GoodDataSdkError } from "@gooddata/sdk-ui";
 import { CoreHeadline, updateConfigWithSettings } from "@gooddata/sdk-ui-charts";
@@ -115,7 +121,7 @@ export class PluggableHeadline extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(sourceVisualization: any, _drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, _drillConfig: any) {
         return sourceVisualization;
     }
 

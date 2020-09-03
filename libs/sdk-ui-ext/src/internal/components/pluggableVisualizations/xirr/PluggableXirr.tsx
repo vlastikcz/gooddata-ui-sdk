@@ -5,6 +5,7 @@ import {
     attributeLocalId,
     bucketAttributes,
     IDimension,
+    IInsight,
     IInsightDefinition,
     insightBucket,
     MeasureGroupIdentifier,
@@ -85,7 +86,7 @@ export class PluggableXirr extends AbstractPluggableVisualization {
         return sanitizeFilters(newReferencePoint);
     };
 
-    public convertOnDrill(sourceVisualization: any, _drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, _drillConfig: any) {
         return sourceVisualization;
     }
 
