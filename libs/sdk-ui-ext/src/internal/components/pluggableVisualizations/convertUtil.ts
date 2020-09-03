@@ -1,22 +1,19 @@
 // (C) 2020 GoodData Corporation
-import isEmpty from "lodash/isEmpty";
-import { IInsight } from "@gooddata/sdk-model";
+import {
+    IAttribute,
+    IAttributeOrMeasure,
+    IBucket,
+    IInsight,
+    isAttribute,
+    VisualizationProperties,
+} from "@gooddata/sdk-model";
 
-// import { GdcVisualizationObject } from "@gooddata/api-model-bear";
-// TODO: import ^
-function isAttribute(bucketItem: any): bucketItem is IAttribute {
-    return !isEmpty(bucketItem) && (bucketItem as any).visualizationAttribute !== undefined;
-}
-
-type IVisualization = any;
-type IAttribute = any;
-type IBucket = any;
-
+// TODO use proper type
 type IImplicitDrillDown = any;
 
 function matchesDrillDownTargetAttribute(drillConfig: IImplicitDrillDown, attribute: IAttribute) {
     const drillSourceLocalIdentifier = drillConfig.implicitDrillDown.from.drillFromAttribute.localIdentifier;
-    return attribute.visualizationAttribute.localIdentifier === drillSourceLocalIdentifier;
+    return attribute.attribute.localIdentifier === drillSourceLocalIdentifier;
 }
 
 type TColumnWidths = {
@@ -33,35 +30,6 @@ type TColumnWidths = {
     };
 };
 
-type TControls = {
-    columnWidths: TColumnWidths[];
-};
-
-type TSortItems = {
-    attributeSortItem?: {
-        attributeIdentifier: string;
-        direction: string;
-    };
-    measureSortItem?: {
-        direction: string;
-        locators: string[];
-    };
-};
-
-interface IRemovedAttribute {
-    visualizationAttribute: {
-        localIdentifier: string;
-        displayForm: {
-            uri: string;
-        };
-    };
-}
-
-interface IVisualizationProperties {
-    controls?: TControls[];
-    sortItems?: TSortItems[];
-}
-
 enum ENUM_PROPERTIES_TYPE {
     CONTROLS = "controls",
 }
@@ -71,24 +39,28 @@ enum ENUM_BUCKETS_TYPE {
     ROLLUP_TOTAL = "nat",
 }
 
-export function removeAttributesFromBuckets(sourceVisualization: IInsight, drillConfig: IImplicitDrillDown) {
+export function removeAttributesFromBuckets(
+    insight: IInsight,
+    drillConfig: IImplicitDrillDown,
+): { insight: IInsight; removedItems: IAttribute[] } {
     const modifiedBuckets: IBucket[] = [];
-    const removedItems: IRemovedAttribute[] = [];
+    const removedItems: IAttribute[] = [];
 
-    sourceVisualization.visualizationObject.content.buckets.forEach((b: any) => {
-        const items = b.items.reduce(
-            (acc: any, i: any) => {
+    insight.insight.buckets.forEach((b: IBucket) => {
+        const items: { removed: IAttribute[]; result: IAttributeOrMeasure[] } = b.items.reduce(
+            (acc: { removed: IAttribute[]; result: IAttributeOrMeasure[] }, i: IAttributeOrMeasure) => {
                 if (isAttribute(i) && matchesDrillDownTargetAttribute(drillConfig, i)) {
+                    const displayForm =
+                        drillConfig.implicitDrillDown.target.drillToAttribute.attributeDisplayForm;
                     return {
-                        removed: [...acc.result],
+                        removed: [...acc.removed, i],
                         result: [
+                            ...acc.result,
                             {
                                 ...i,
-                                visualizationAttribute: {
-                                    ...i.visualizationAttribute,
-                                    displayForm:
-                                        drillConfig.implicitDrillDown.target.drillToAttribute
-                                            .attributeDisplayForm,
+                                attribute: {
+                                    ...i.attribute,
+                                    displayForm,
                                     alias: undefined,
                                 },
                             },
@@ -105,32 +77,29 @@ export function removeAttributesFromBuckets(sourceVisualization: IInsight, drill
         removedItems.push(...items.removed);
     });
 
-    const resultVisualization = {
-        ...sourceVisualization,
-        visualizationObject: {
-            ...sourceVisualization.visualizationObject,
-            content: {
-                ...sourceVisualization.visualizationObject.content,
-                buckets: modifiedBuckets,
-            },
+    const resultInsight = {
+        ...insight,
+        insight: {
+            ...insight.insight,
+            buckets: modifiedBuckets,
         },
     };
 
     return {
-        visualization: resultVisualization,
-        removed: removedItems || [],
+        insight: resultInsight,
+        removedItems: removedItems || [],
     };
 }
 
-function removeTotalsForRemovedAttributes(visualization: IVisualization, removed: IRemovedAttribute[]) {
-    const result = visualization.visualizationObject.content.buckets.map((b: any) => {
+function removeTotalsForRemovedAttributes(insight: IInsight, removed: IAttribute[]) {
+    const result = insight.insight.buckets.map((b: any) => {
         if (b.localIdentifier === ENUM_BUCKETS_TYPE.ATTRIBUTE && b.totals) {
             const totals = b.totals.filter(
                 (t: any) =>
                     !removed.find(
                         (r) =>
                             t.type === ENUM_BUCKETS_TYPE.ROLLUP_TOTAL &&
-                            r.visualizationAttribute.localIdentifier === t.attributeIdentifier,
+                            r.attribute.localIdentifier === t.attributeIdentifier,
                     ),
             );
 
@@ -141,25 +110,20 @@ function removeTotalsForRemovedAttributes(visualization: IVisualization, removed
     });
 
     return {
-        ...visualization,
-        visualizationObject: {
-            ...visualization.visualizationObject,
-            content: {
-                ...visualization.visualizationObject.content,
-                buckets: result,
-            },
+        ...insight,
+        insight: {
+            ...insight.insight,
+            buckets: result,
         },
     };
 }
 
-function removePropertiesForRemovedAttributes(visualization: IVisualization, removed: IRemovedAttribute[]) {
-    if (!visualization.visualizationObject.content.properties) {
-        return visualization;
+function removePropertiesForRemovedAttributes(insight: IInsight, removed: IAttribute[]) {
+    if (!insight.insight.properties) {
+        return insight;
     }
 
-    const properties: IVisualizationProperties = JSON.parse(
-        visualization.visualizationObject.content.properties,
-    );
+    const properties: VisualizationProperties = insight.insight.properties;
 
     const result = Object.entries(properties).reduce((acc, [key, value]) => {
         if (key === ENUM_PROPERTIES_TYPE.CONTROLS && value.columnWidths) {
@@ -167,8 +131,7 @@ function removePropertiesForRemovedAttributes(visualization: IVisualization, rem
                 c.attributeColumnWidthItem
                     ? !removed.some(
                           (r) =>
-                              c.attributeColumnWidthItem.attributeIdentifier ===
-                              r.visualizationAttribute.localIdentifier,
+                              c.attributeColumnWidthItem.attributeIdentifier === r.attribute.localIdentifier,
                       )
                     : c,
             );
@@ -185,24 +148,21 @@ function removePropertiesForRemovedAttributes(visualization: IVisualization, rem
     }, properties);
 
     return {
-        ...visualization,
-        visualizationObject: {
-            ...visualization.visualizationObject,
-            content: {
-                ...visualization.visualizationObject.content,
-                properties: JSON.stringify(result),
-            },
+        ...insight,
+        insight: {
+            ...insight.insight,
+            properties: result,
         },
     };
 }
 
-export function sanitizeTableProperties(sourceVisualization: IInsight, removed: any) {
-    let updateVisualization = sourceVisualization;
+export function sanitizeTableProperties(insight: IInsight, removed: IAttribute[]): IInsight {
+    let updatedInsight = insight;
 
     if (removed.length > 0) {
-        updateVisualization = removeTotalsForRemovedAttributes(updateVisualization, removed);
-        updateVisualization = removePropertiesForRemovedAttributes(updateVisualization, removed);
+        updatedInsight = removeTotalsForRemovedAttributes(updatedInsight, removed);
+        updatedInsight = removePropertiesForRemovedAttributes(updatedInsight, removed);
     }
 
-    return updateVisualization;
+    return updatedInsight;
 }

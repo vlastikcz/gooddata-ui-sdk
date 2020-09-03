@@ -139,8 +139,8 @@ export class PluggableBaseChart extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
-        return removeAttributesFromBuckets(sourceVisualization, drillConfig).visualization;
+    public convertOnDrill(source: IInsight, drillConfig: any): IInsight {
+        return removeAttributesFromBuckets(source, drillConfig).insight;
     }
 
     public isOpenAsReportSupported(): boolean {
