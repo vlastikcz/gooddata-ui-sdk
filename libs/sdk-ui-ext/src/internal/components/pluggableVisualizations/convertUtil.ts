@@ -9,7 +9,7 @@ import {
 } from "@gooddata/sdk-model";
 
 // TODO use proper type
-type IImplicitDrillDown = any;
+export type IImplicitDrillDown = any;
 
 function matchesDrillDownTargetAttribute(drillConfig: IImplicitDrillDown, attribute: IAttribute) {
     const drillSourceLocalIdentifier = drillConfig.implicitDrillDown.from.drillFromAttribute.localIdentifier;
@@ -53,6 +53,7 @@ export function removeAttributesFromBuckets(
                     const displayForm =
                         drillConfig.implicitDrillDown.target.drillToAttribute.attributeDisplayForm;
                     return {
+                        // TODO is this correct? please see original impl in KD
                         removed: [...acc.removed, i],
                         result: [
                             ...acc.result,
