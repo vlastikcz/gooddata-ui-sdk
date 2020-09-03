@@ -10,6 +10,7 @@ import { IExecutionFactory, ISettings, SettingCatalog } from "@gooddata/sdk-back
 import {
     bucketAttribute,
     IDimension,
+    IInsight,
     IInsightDefinition,
     insightBucket,
     insightBuckets,
@@ -217,7 +218,7 @@ export class PluggablePivotTable extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(sourceVisualization: any, drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
         const { visualization, removed } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
         return sanitizeTableProperties(visualization, removed);
     }

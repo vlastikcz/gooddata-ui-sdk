@@ -4,6 +4,7 @@ import {
     bucketsIsEmpty,
     IColorMappingItem,
     IDimension,
+    IInsight,
     IInsightDefinition,
     insightBuckets,
     insightHasMeasures,
@@ -138,7 +139,7 @@ export class PluggableBaseChart extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(sourceVisualization: any, drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
         return removeAttributesFromBuckets(sourceVisualization, drillConfig).visualization;
     }
 

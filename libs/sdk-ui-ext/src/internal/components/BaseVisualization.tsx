@@ -1,6 +1,12 @@
 // (C) 2019 GoodData Corporation
 import { IAnalyticalBackend, IExecutionFactory, ISettings } from "@gooddata/sdk-backend-spi";
-import { IInsightDefinition, insightProperties, IVisualizationClass, visClassUrl } from "@gooddata/sdk-model";
+import {
+    IInsight,
+    IInsightDefinition,
+    insightProperties,
+    IVisualizationClass,
+    visClassUrl,
+} from "@gooddata/sdk-model";
 import React from "react";
 import { render } from "react-dom";
 import uuid from "uuid";
@@ -249,7 +255,7 @@ export class BaseVisualization extends React.PureComponent<IBaseVisualizationPro
         return !isEqual(omit(currentReferencePoint, "properties"), omit(nextReferencePoint, "properties"));
     }
 
-    public convertOnDrill(sourceVisualization: any, drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
         return this.visualization.convertOnDrill(sourceVisualization, drillConfig);
     }
 }

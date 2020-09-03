@@ -1,5 +1,6 @@
 // (C) 2020 GoodData Corporation
 import isEmpty from "lodash/isEmpty";
+import { IInsight } from "@gooddata/sdk-model";
 
 // import { GdcVisualizationObject } from "@gooddata/api-model-bear";
 // TODO: import ^
@@ -70,10 +71,7 @@ enum ENUM_BUCKETS_TYPE {
     ROLLUP_TOTAL = "nat",
 }
 
-export function removeAttributesFromBuckets(
-    sourceVisualization: IVisualization,
-    drillConfig: IImplicitDrillDown,
-) {
+export function removeAttributesFromBuckets(sourceVisualization: IInsight, drillConfig: IImplicitDrillDown) {
     const modifiedBuckets: IBucket[] = [];
     const removedItems: IRemovedAttribute[] = [];
 
@@ -198,7 +196,7 @@ function removePropertiesForRemovedAttributes(visualization: IVisualization, rem
     };
 }
 
-export function sanitizeTableProperties(sourceVisualization: IVisualization, removed: any) {
+export function sanitizeTableProperties(sourceVisualization: IInsight, removed: any) {
     let updateVisualization = sourceVisualization;
 
     if (removed.length > 0) {
