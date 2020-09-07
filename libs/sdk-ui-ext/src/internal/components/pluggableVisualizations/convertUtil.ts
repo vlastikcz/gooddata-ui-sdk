@@ -53,10 +53,8 @@ export function removeAttributesFromBuckets(
                     const displayForm =
                         drillConfig.implicitDrillDown.target.drillToAttribute.attributeDisplayForm;
                     return {
-                        // TODO is this correct? please see original impl in KD
-                        removed: [...acc.removed, i],
+                        removed: [...acc.result].filter(isAttribute),
                         result: [
-                            ...acc.result,
                             {
                                 ...i,
                                 attribute: {
