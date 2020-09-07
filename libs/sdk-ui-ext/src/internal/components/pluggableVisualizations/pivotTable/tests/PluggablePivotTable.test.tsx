@@ -23,7 +23,7 @@ import {
 } from "../../../../interfaces/Visualization";
 import { DefaultLocale, IDrillableItem, ILocale, VisualizationEnvironment } from "@gooddata/sdk-ui";
 import { ColumnWidthItem, CorePivotTable } from "@gooddata/sdk-ui-pivot";
-import { ISortItem } from "@gooddata/sdk-model";
+import { IInsight, ISortItem } from "@gooddata/sdk-model";
 import { dummyBackend } from "@gooddata/sdk-backend-mockingbird";
 import { ISettings } from "@gooddata/sdk-backend-spi";
 import noop from "lodash/noop";
@@ -48,6 +48,7 @@ import {
     validAttributeSort,
     validMeasureSort,
 } from "./sortMocks";
+import { drillConfig, sourceInsight } from "./convertOnDrillMocks";
 
 describe("PluggablePivotTable", () => {
     const backend = dummyBackend();
@@ -79,6 +80,78 @@ describe("PluggablePivotTable", () => {
         expect(visualization).toBeTruthy();
     });
 
+    describe("convertOnDrill", () => {
+        it("should delete intersection filter attributes and sanitize properties", () => {
+            const pivotTable = createComponent();
+            const result: IInsight = pivotTable.convertOnDrill(sourceInsight, drillConfig);
+            const expected: IInsight = {
+                insight: {
+                    title: "visualizationObject",
+                    identifier: "visualizationObject",
+                    uri: "/visualizationObject",
+                    visualizationUrl: "visualizationClass-url",
+                    filters: [],
+                    sorts: [],
+                    buckets: [
+                        {
+                            localIdentifier: "attribute",
+                            items: [
+                                {
+                                    attribute: {
+                                        localIdentifier: "d7e1d1a3e9d8484bb0c7a858261c0f85",
+                                        displayForm: {
+                                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1057",
+                                        },
+                                        alias: undefined,
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            localIdentifier: "measure",
+                            items: [
+                                {
+                                    measure: {
+                                        localIdentifier: "627758b4e135480c8b39d61146178e0b",
+                                        definition: {
+                                            measureDefinition: {
+                                                item: {
+                                                    uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1268",
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                    properties: {
+                        controls: {
+                            columnWidths: [
+                                {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "d7e1d1a3e9d8484bb0c7a858261c0f85",
+                                        width: { value: 255 },
+                                    },
+                                },
+                                { measureColumnWidthItem: { width: { value: 270 } } },
+                            ],
+                        },
+                        sortItems: [
+                            {
+                                attributeSortItem: {
+                                    attributeIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                                    direction: "desc",
+                                },
+                            },
+                        ],
+                    },
+                },
+            };
+            expect(result).toEqual(expected);
+        });
+    });
+
     describe("update", () => {
         function getDefaultOptions(): IVisProps {
             const locale: ILocale = DefaultLocale;
@@ -94,6 +167,7 @@ describe("PluggablePivotTable", () => {
                 },
             };
         }
+
         const emptyPropertiesMeta = {};
 
         function spyOnFakeElement() {

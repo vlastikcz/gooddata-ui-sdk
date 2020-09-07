@@ -44,7 +44,7 @@ const properties: IVisualizationProperties = {
     ],
 };
 
-const sourceVisualization: IInsight = {
+const sourceInsight: IInsight = {
     insight: {
         title: "visualizationObject",
         identifier: "visualizationObject",
@@ -219,7 +219,7 @@ describe("DrillDownService", () => {
         });
 
         it("should delete intersection filter attributes and sanitize properties", () => {
-            const result = removeAttributesFromBuckets(sourceVisualization, drillConfig);
+            const result = removeAttributesFromBuckets(sourceInsight, drillConfig);
             const expected: IInsight = {
                 insight: {
                     title: "visualizationObject",
