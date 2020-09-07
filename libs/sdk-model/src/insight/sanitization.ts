@@ -60,10 +60,7 @@ function filterInvalidTotalAttributesInBucket(totals: ITotal[], bucket: IBucket)
     const attributes = bucket.items
         .filter(isAttribute)
         .map((attribute) => attribute.attribute.localIdentifier);
-    return totals.filter((total) => {
-        const x = attributes.includes(total.attributeIdentifier);
-        return x;
-    });
+    return totals.filter((total) => attributes.includes(total.attributeIdentifier));
 }
 
 function getBucketTotalsWithoutSubtotals(bucket: IBucket): ITotal[] {
