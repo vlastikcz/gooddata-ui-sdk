@@ -46,9 +46,9 @@ const properties: IVisualizationProperties = {
 
 const sourceVisualization: IInsight = {
     insight: {
-        title: "",
-        identifier: "",
-        uri: "",
+        title: "visualizationObject",
+        identifier: "visualizationObject",
+        uri: "/visualizationObject",
         visualizationUrl: "visualizationClass-url",
         filters: [],
         sorts: [],
@@ -266,6 +266,30 @@ describe("DrillDownService", () => {
                             columnWidths: [
                                 {
                                     attributeColumnWidthItem: {
+                                        attributeIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                                        width: {
+                                            value: 131,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "cab454e65960422282bf565291d0323f",
+                                        width: {
+                                            value: 125,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "d3aa6c103c704f51a0f1c7f1dddc94f4",
+                                        width: {
+                                            value: 97,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
                                         attributeIdentifier: "d7e1d1a3e9d8484bb0c7a858261c0f85",
                                         width: { value: 255 },
                                     },
@@ -284,7 +308,34 @@ describe("DrillDownService", () => {
                     },
                 },
             };
+            const removedItems = [
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1091",
+                        },
+                        localIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                    },
+                },
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1089",
+                        },
+                        localIdentifier: "cab454e65960422282bf565291d0323f",
+                    },
+                },
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1103",
+                        },
+                        localIdentifier: "d3aa6c103c704f51a0f1c7f1dddc94f4",
+                    },
+                },
+            ];
             expect(result.insight).toEqual(expected);
+            expect(result.removedItems).toEqual(removedItems);
         });
 
         it("should update totals according to the deleted intersection attribute filters", () => {
@@ -386,7 +437,13 @@ describe("DrillDownService", () => {
                                     },
                                 },
                             ],
-                            totals: [],
+                            totals: [
+                                {
+                                    attributeIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                                    measureIdentifier: "627758b4e135480c8b39d61146178e0b",
+                                    type: "nat",
+                                },
+                            ],
                         },
                         {
                             localIdentifier: "measure",
@@ -411,6 +468,30 @@ describe("DrillDownService", () => {
                             columnWidths: [
                                 {
                                     attributeColumnWidthItem: {
+                                        attributeIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                                        width: {
+                                            value: 131,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "cab454e65960422282bf565291d0323f",
+                                        width: {
+                                            value: 125,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "d3aa6c103c704f51a0f1c7f1dddc94f4",
+                                        width: {
+                                            value: 97,
+                                        },
+                                    },
+                                },
+                                {
+                                    attributeColumnWidthItem: {
                                         attributeIdentifier: "d7e1d1a3e9d8484bb0c7a858261c0f85",
                                         width: { value: 255 },
                                     },
@@ -429,7 +510,34 @@ describe("DrillDownService", () => {
                     },
                 },
             };
+            const removedItems = [
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1091",
+                        },
+                        localIdentifier: "c3e615724abf4f2399d3191a6276c91a",
+                    },
+                },
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1089",
+                        },
+                        localIdentifier: "cab454e65960422282bf565291d0323f",
+                    },
+                },
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1103",
+                        },
+                        localIdentifier: "d3aa6c103c704f51a0f1c7f1dddc94f4",
+                    },
+                },
+            ];
             expect(result.insight).toEqual(expected);
+            expect(result.removedItems).toEqual(removedItems);
         });
         it("should respect sort and column width", () => {
             const drillConfig: IImplicitDrillDown = {
@@ -627,6 +735,14 @@ describe("DrillDownService", () => {
                                     },
                                 },
                                 {
+                                    attributeColumnWidthItem: {
+                                        attributeIdentifier: "fcc12cf3e42546b1bec56778fd753a0a",
+                                        width: {
+                                            value: 109,
+                                        },
+                                    },
+                                },
+                                {
                                     measureColumnWidthItem: {
                                         locators: [
                                             {
@@ -688,7 +804,19 @@ describe("DrillDownService", () => {
                 },
             };
 
+            const removedItems = [
+                {
+                    attribute: {
+                        displayForm: {
+                            uri: "/gdc/md/heo9nbbna28ol3jnai0ut79tjer5cqdn/obj/1094",
+                        },
+                        localIdentifier: "fcc12cf3e42546b1bec56778fd753a0a",
+                    },
+                },
+            ];
+
             expect(result.insight).toEqual(expected);
+            expect(result.removedItems).toEqual(removedItems);
         });
     });
 });
