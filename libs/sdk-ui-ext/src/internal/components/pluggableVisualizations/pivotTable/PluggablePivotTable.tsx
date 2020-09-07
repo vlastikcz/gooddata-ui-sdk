@@ -219,8 +219,8 @@ export class PluggablePivotTable extends AbstractPluggableVisualization {
     }
 
     public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
-        const { visualization, removed } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
-        return sanitizeTableProperties(visualization, removed);
+        const { insight, removedItems } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
+        return sanitizeTableProperties(insight, removedItems);
     }
 
     private createCorePivotTableProps = () => {
