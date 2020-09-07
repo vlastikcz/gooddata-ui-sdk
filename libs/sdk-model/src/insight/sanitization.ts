@@ -1,10 +1,11 @@
 // (C) 2020 GoodData Corporation
 import { InvariantError } from "ts-invariant";
 
-import { insightSorts, IInsightDefinition, insightBuckets, insightSetBuckets } from ".";
-import { bucketTotals, IBucket, bucketAttributeIndex, bucketSetTotals } from "../execution/buckets";
-import { ISortItem, isAttributeSort, sortEntityIds, isMeasureSort } from "../execution/base/sort";
+import { IInsightDefinition, insightBuckets, insightSetBuckets, insightSorts } from ".";
+import { bucketAttributeIndex, bucketSetTotals, bucketTotals, IBucket } from "../execution/buckets";
+import { isAttributeSort, isMeasureSort, ISortItem, sortEntityIds } from "../execution/base/sort";
 import { ITotal } from "../execution/base/totals";
+import { isAttribute } from "../execution/attribute";
 
 /**
  * Makes sure the insight does not have any nonsensical data (like totals that no longer make sense, etc.), before it is saved.
@@ -21,12 +22,19 @@ function removeInvalidTotals<T extends IInsightDefinition>(insight: T): T {
 
     const sanitizedBuckets = insightBuckets(insight).map((bucket) => {
         const totals = bucketTotals(bucket);
+
         if (totals.length && isSortedOnDifferentThanFirstAttributeInBucket(bucket, sortItems)) {
             bucket.totals = getBucketTotalsWithoutSubtotals(bucket);
-            if (bucket.totals.length === 0) {
+            if (totals.length === 0) {
                 return bucketSetTotals(bucket, []);
             }
         }
+
+        const sanitizedTotals = totals.length ? filterInvalidTotalAttributesInBucket(totals, bucket) : totals;
+        if (sanitizedTotals.length !== totals.length) {
+            return bucketSetTotals(bucket, sanitizedTotals);
+        }
+
         return bucket;
     });
 
@@ -45,6 +53,16 @@ function isSortedOnDifferentThanFirstAttributeInBucket(bucket: IBucket, sortItem
         throw new InvariantError(
             'Unexpected sortType, only supported sortTypes are "attributeSortItem" and "measureSortItem"',
         );
+    });
+}
+
+function filterInvalidTotalAttributesInBucket(totals: ITotal[], bucket: IBucket): ITotal[] {
+    const attributes = bucket.items
+        .filter(isAttribute)
+        .map((attribute) => attribute.attribute.localIdentifier);
+    return totals.filter((total) => {
+        const x = attributes.includes(total.attributeIdentifier);
+        return x;
     });
 }
 
