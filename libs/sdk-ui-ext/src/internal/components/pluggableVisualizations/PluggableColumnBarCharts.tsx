@@ -103,7 +103,9 @@ export class PluggableColumnBarCharts extends PluggableBaseChart {
                     displayForm: {
                         uri: h.attributeHeader.uri,
                     },
-                    in: [h.attributeHeaderItem.uri],
+                    in: {
+                        uris: [h.attributeHeaderItem.uri],
+                    },
                 },
             }));
 

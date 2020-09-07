@@ -26,10 +26,11 @@ import { DEFAULT_BULLET_CHART_CONFIG } from "../../../constants/uiConfig";
 import { BULLET_CHART_SUPPORTED_PROPERTIES } from "../../../constants/supportedProperties";
 import BulletChartConfigurationPanel from "../../configurationPanels/BulletChartConfigurationPanel";
 import { getReferencePointWithSupportedProperties } from "../../../utils/propertiesHelper";
-import { VisualizationTypes } from "@gooddata/sdk-ui";
-import { IInsightDefinition } from "@gooddata/sdk-model";
+import { isDrillIntersectionAttributeItem, VisualizationTypes } from "@gooddata/sdk-ui";
+import { IInsight, IInsightDefinition } from "@gooddata/sdk-model";
 import { transformBuckets } from "./bucketHelper";
 import { SettingCatalog } from "@gooddata/sdk-backend-spi";
+import { removeAttributesFromBuckets } from "../convertUtil";
 
 export class PluggableBulletChart extends PluggableBaseChart {
     constructor(props: IVisConstruct) {
@@ -68,6 +69,41 @@ export class PluggableBulletChart extends PluggableBaseChart {
         this.setPrimaryMeasureIsMissingError(buckets);
 
         return Promise.resolve(sanitizeFilters(newReferencePoint));
+    }
+
+    private addFiltersForBullet(source: IInsight, drillConfig: any, _event: any) {
+        const clicked = drillConfig.implicitDrillDown.from.drillFromAttribute.localIdentifier;
+
+        let intersection = _event.drillContext.intersection;
+        const index = intersection.findIndex(
+            (item: any) =>
+                item.header.attributeHeader && item.header.attributeHeader.localIdentifier === clicked,
+        );
+        const cutIntersection = intersection.slice(index);
+
+        const filters = cutIntersection
+            .map((i: any) => i.header)
+            .filter(isDrillIntersectionAttributeItem)
+            .map((h: any) => ({
+                positiveAttributeFilter: {
+                    displayForm: {
+                        uri: h.attributeHeader.uri,
+                    },
+                    in: [h.attributeHeaderItem.uri],
+                },
+            }));
+
+        return {
+            insight: {
+                ...source.insight,
+                filters: [...source.insight.filters, ...filters],
+            },
+        };
+    }
+
+    public convertOnDrill(source: IInsight, drillConfig: any, event: any): IInsight {
+        const withFilters = this.addFiltersForBullet(source, drillConfig, event);
+        return removeAttributesFromBuckets(withFilters, drillConfig).insight;
     }
 
     protected renderConfigurationPanel(insight: IInsightDefinition): React.ReactNode {
