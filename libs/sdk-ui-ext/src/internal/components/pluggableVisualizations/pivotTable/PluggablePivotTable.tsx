@@ -16,6 +16,7 @@ import {
     insightBuckets,
     insightHasDataDefined,
     insightProperties,
+    insightSanitize,
     insightSorts,
     ISortItem,
     newAttributeSort,
@@ -69,15 +70,14 @@ import UnsupportedConfigurationPanel from "../../configurationPanels/Unsupported
 import { AbstractPluggableVisualization } from "../AbstractPluggableVisualization";
 import { PIVOT_TABLE_SUPPORTED_PROPERTIES } from "../../../constants/supportedProperties";
 import {
-    adaptReferencePointWidthItemsToPivotTable,
     adaptMdObjectWidthItemsToPivotTable,
+    adaptReferencePointWidthItemsToPivotTable,
 } from "./widthItemsHelpers";
 import {
-    sanitizePivotTableSorts,
     adaptReferencePointSortItemsToPivotTable,
     addDefaultSort,
+    sanitizePivotTableSorts,
 } from "./sortItemsHelpers";
-import { sanitizeTableProperties } from "../convertUtil";
 
 export const getColumnAttributes = (buckets: IBucketOfFun[]): IBucketItem[] => {
     return getItemsFromBuckets(
@@ -219,8 +219,9 @@ export class PluggablePivotTable extends AbstractPluggableVisualization {
     }
 
     public convertOnDrill(sourceVisualization: IInsight, drillConfig: any): IInsight {
-        const { insight, removedItems } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
-        return sanitizeTableProperties(insight, removedItems);
+        const { insight } = removeAttributesFromBuckets(sourceVisualization, drillConfig);
+        //return sanitizeTableProperties(insight, removedItems);
+        return insightSanitize(insight);
     }
 
     private createCorePivotTableProps = () => {

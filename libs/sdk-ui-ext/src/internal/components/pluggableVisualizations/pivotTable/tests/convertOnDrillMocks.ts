@@ -4,7 +4,7 @@ import { IInsight } from "@gooddata/sdk-model";
 import { IImplicitDrillDown } from "../../convertUtil";
 import { IVisualizationProperties } from "../../../..";
 
-const properties: IVisualizationProperties = {
+export const properties: IVisualizationProperties = {
     controls: {
         columnWidths: [
             {

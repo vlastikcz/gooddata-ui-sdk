@@ -91,21 +91,21 @@ export function removeAttributesFromBuckets(
 }
 
 function removeTotalsForRemovedAttributes(insight: IInsight, removed: IAttribute[]) {
-    const result = insight.insight.buckets.map((b: any) => {
-        if (b.localIdentifier === ENUM_BUCKETS_TYPE.ATTRIBUTE && b.totals) {
-            const totals = b.totals.filter(
-                (t: any) =>
+    const result = insight.insight.buckets.map((bucket: any) => {
+        if (bucket.localIdentifier === ENUM_BUCKETS_TYPE.ATTRIBUTE && bucket.totals) {
+            const totals = bucket.totals.filter(
+                (total: any) =>
                     !removed.find(
                         (r) =>
-                            t.type === ENUM_BUCKETS_TYPE.ROLLUP_TOTAL &&
-                            r.attribute.localIdentifier === t.attributeIdentifier,
+                            total.type === ENUM_BUCKETS_TYPE.ROLLUP_TOTAL &&
+                            r.attribute.localIdentifier === total.attributeIdentifier,
                     ),
             );
 
-            return { ...b, totals };
+            return { ...bucket, totals };
         }
 
-        return { ...b };
+        return { ...bucket };
     });
 
     return {
