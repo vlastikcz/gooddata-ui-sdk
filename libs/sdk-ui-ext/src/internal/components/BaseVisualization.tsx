@@ -255,7 +255,7 @@ export class BaseVisualization extends React.PureComponent<IBaseVisualizationPro
         return !isEqual(omit(currentReferencePoint, "properties"), omit(nextReferencePoint, "properties"));
     }
 
-    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any) {
-        return this.visualization.convertOnDrill(sourceVisualization, drillConfig);
+    public convertOnDrill(sourceVisualization: IInsight, drillConfig: any, event: any) {
+        return this.visualization.convertOnDrill(sourceVisualization, drillConfig, event);
     }
 }

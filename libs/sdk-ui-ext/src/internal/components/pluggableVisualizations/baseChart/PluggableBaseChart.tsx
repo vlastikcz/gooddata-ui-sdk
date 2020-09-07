@@ -10,7 +10,13 @@ import {
     insightHasMeasures,
     insightMeasures,
 } from "@gooddata/sdk-model";
-import { BucketNames, ChartType, GoodDataSdkError, VisualizationTypes } from "@gooddata/sdk-ui";
+import {
+    isDrillIntersectionAttributeItem,
+    BucketNames,
+    ChartType,
+    GoodDataSdkError,
+    VisualizationTypes,
+} from "@gooddata/sdk-ui";
 import { BaseChart, ColorUtils, IAxisConfig, IChartConfig } from "@gooddata/sdk-ui-charts";
 import React from "react";
 import { render } from "react-dom";
@@ -139,8 +145,31 @@ export class PluggableBaseChart extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(source: IInsight, drillConfig: any): IInsight {
-        return removeAttributesFromBuckets(source, drillConfig).insight;
+    private addFilters(source: IInsight, _drillConfig: any, _event: any) {
+        let intersection = _event.drillContext.intersection;
+        const filters = intersection
+            .map((i: any) => i.header)
+            .filter(isDrillIntersectionAttributeItem)
+            .map((h: any) => ({
+                positiveAttributeFilter: {
+                    displayForm: {
+                        uri: h.attributeHeader.uri,
+                    },
+                    in: [h.attributeHeaderItem.uri],
+                },
+            }));
+
+        return {
+            insight: {
+                ...source.insight,
+                filters: [...source.insight.filters, ...filters],
+            },
+        };
+    }
+
+    public convertOnDrill(source: IInsight, drillConfig: any, event: any): IInsight {
+        const withFilters = this.addFilters(source, drillConfig, event);
+        return removeAttributesFromBuckets(withFilters, drillConfig).insight;
     }
 
     public isOpenAsReportSupported(): boolean {

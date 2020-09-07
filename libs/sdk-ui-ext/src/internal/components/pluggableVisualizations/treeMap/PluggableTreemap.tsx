@@ -5,7 +5,7 @@ import get from "lodash/get";
 import isEmpty from "lodash/isEmpty";
 import set from "lodash/set";
 import tail from "lodash/tail";
-import { BucketNames, VisualizationTypes } from "@gooddata/sdk-ui";
+import { isDrillIntersectionAttributeItem, BucketNames, VisualizationTypes } from "@gooddata/sdk-ui";
 import { render } from "react-dom";
 import { BUCKETS } from "../../../constants/bucket";
 import { TREEMAP_SUPPORTED_PROPERTIES } from "../../../constants/supportedProperties";
@@ -35,8 +35,9 @@ import { removeSort } from "../../../utils/sort";
 import { setTreemapUiConfig } from "../../../utils/uiConfigHelpers/treemapUiConfigHelper";
 import TreeMapConfigurationPanel from "../../configurationPanels/TreeMapConfigurationPanel";
 import { PluggableBaseChart } from "../baseChart/PluggableBaseChart";
-import { IInsightDefinition } from "@gooddata/sdk-model";
+import { IInsight, IInsightDefinition } from "@gooddata/sdk-model";
 import { SettingCatalog } from "@gooddata/sdk-backend-spi";
+import { removeAttributesFromBuckets } from "../convertUtil";
 
 export class PluggableTreemap extends PluggableBaseChart {
     constructor(props: IVisConstruct) {
@@ -105,6 +106,43 @@ export class PluggableTreemap extends PluggableBaseChart {
         newReferencePoint = removeSort(newReferencePoint);
 
         return Promise.resolve(sanitizeFilters(newReferencePoint));
+    }
+
+    private addFiltersForTreemap(source: IInsight, drillConfig: any, _event: any) {
+        const clicked = drillConfig.implicitDrillDown.from.drillFromAttribute.localIdentifier;
+
+        // treemap just reverse the intersection
+        const intersection = _event.drillContext.intersection.reverse();
+
+        const index = intersection.findIndex(
+            (item: any) =>
+                item.header.attributeHeader && item.header.attributeHeader.localIdentifier === clicked,
+        );
+        const cutIntersection = intersection.slice(index);
+
+        const filters = cutIntersection
+            .map((i: any) => i.header)
+            .filter(isDrillIntersectionAttributeItem)
+            .map((h: any) => ({
+                positiveAttributeFilter: {
+                    displayForm: {
+                        uri: h.attributeHeader.uri,
+                    },
+                    in: [h.attributeHeaderItem.uri],
+                },
+            }));
+
+        return {
+            insight: {
+                ...source.insight,
+                filters: [...source.insight.filters, ...filters],
+            },
+        };
+    }
+
+    public convertOnDrill(source: IInsight, drillConfig: any, event: any): IInsight {
+        const withFilters = this.addFiltersForTreemap(source, drillConfig, event);
+        return removeAttributesFromBuckets(withFilters, drillConfig).insight;
     }
 
     protected renderConfigurationPanel(insight: IInsightDefinition): void {

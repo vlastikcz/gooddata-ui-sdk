@@ -1,8 +1,9 @@
 // (C) 2019 GoodData Corporation
 import get from "lodash/get";
 import set from "lodash/set";
-import { bucketsItems, IInsightDefinition, insightBuckets } from "@gooddata/sdk-model";
-import { BucketNames } from "@gooddata/sdk-ui";
+import last from "lodash/last";
+import { IInsight, bucketsItems, IInsightDefinition, insightBuckets } from "@gooddata/sdk-model";
+import { isDrillIntersectionAttributeItem, BucketNames } from "@gooddata/sdk-ui";
 import { AXIS } from "../../constants/axis";
 import { BUCKETS } from "../../constants/bucket";
 import { MAX_CATEGORIES_COUNT, MAX_STACKS_COUNT, UICONFIG, UICONFIG_AXIS } from "../../constants/uiConfig";
@@ -29,6 +30,7 @@ import {
 } from "../../utils/propertiesHelper";
 import { setColumnBarChartUiConfig } from "../../utils/uiConfigHelpers/columnBarChartUiConfigHelper";
 import { PluggableBaseChart } from "./baseChart/PluggableBaseChart";
+import { removeAttributesFromBuckets } from "./convertUtil";
 
 export class PluggableColumnBarCharts extends PluggableBaseChart {
     constructor(props: IVisConstruct) {
@@ -65,6 +67,57 @@ export class PluggableColumnBarCharts extends PluggableBaseChart {
             !isStackingMeasure(this.visualizationProperties) &&
             !isStackingToPercent(this.visualizationProperties)
         );
+    }
+
+    private addFiltersForColumnBar(source: IInsight, drillConfig: any, _event: any) {
+        const clicked = drillConfig.implicitDrillDown.from.drillFromAttribute.localIdentifier;
+        const buckets = source.insight.buckets;
+
+        // column chart
+        const stack = get(
+            buckets.find((bucket) => bucket.localIdentifier === BucketNames.STACK),
+            "items",
+            [],
+        );
+
+        let reorderedIntersection = _event.drillContext.intersection;
+        if (stack.length > 0) {
+            const lastItem = last(reorderedIntersection);
+            const beginning = reorderedIntersection.slice(0, -1);
+
+            // don't care about measures, they'll be filtered out
+            reorderedIntersection = [lastItem, ...beginning];
+        }
+
+        const index = reorderedIntersection.findIndex(
+            (item: any) =>
+                item.header.attributeHeader && item.header.attributeHeader.localIdentifier === clicked,
+        );
+        const cutIntersection = reorderedIntersection.slice(index);
+
+        const filters = cutIntersection
+            .map((i: any) => i.header)
+            .filter(isDrillIntersectionAttributeItem)
+            .map((h: any) => ({
+                positiveAttributeFilter: {
+                    displayForm: {
+                        uri: h.attributeHeader.uri,
+                    },
+                    in: [h.attributeHeaderItem.uri],
+                },
+            }));
+
+        return {
+            insight: {
+                ...source.insight,
+                filters: [...source.insight.filters, ...filters],
+            },
+        };
+    }
+
+    public convertOnDrill(source: IInsight, drillConfig: any, event: any): IInsight {
+        const withFilters = this.addFiltersForColumnBar(source, drillConfig, event);
+        return removeAttributesFromBuckets(withFilters, drillConfig).insight;
     }
 
     protected configureBuckets(extendedReferencePoint: IExtendedReferencePoint): void {

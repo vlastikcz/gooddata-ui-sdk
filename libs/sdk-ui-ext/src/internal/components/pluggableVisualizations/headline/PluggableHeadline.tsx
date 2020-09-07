@@ -121,7 +121,7 @@ export class PluggableHeadline extends AbstractPluggableVisualization {
         return Promise.resolve(sanitizeFilters(newReferencePoint));
     }
 
-    public convertOnDrill(sourceVisualization: IInsight, _drillConfig: any) {
+    public convertOnDrill(sourceVisualization: IInsight, _drillConfig: any, _event: any) {
         return sourceVisualization;
     }
 

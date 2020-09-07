@@ -347,7 +347,7 @@ export interface IVisualization {
         }
      */
 
-    convertOnDrill(source: IInsight, drillConfig: any): IInsight;
+    convertOnDrill(source: IInsight, drillConfig: any, event: any): IInsight;
 }
 
 export interface IGdcConfig {
