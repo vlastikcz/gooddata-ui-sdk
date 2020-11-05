@@ -55,13 +55,15 @@ const createLookups = (
     displayFormByUri: IDisplayFormByKey;
     attributeByDisplayFormUri: IAttributeByKey;
 } => {
-    const [attributes, displayForms] = partition(displayFormsAndAttributes, GdcMetadata.isWrappedAttribute);
-    const unwrappedDisplayForms = displayForms.map((df) => df.attributeDisplayForm);
+    const [attributes] = partition(displayFormsAndAttributes, GdcMetadata.isWrappedAttribute);
+    const displayForms: GdcMetadata.IAttributeDisplayForm[] = flatMap(
+        attributes.map((item: GdcMetadata.IWrappedAttribute) => item.attribute.content.displayForms),
+    );
 
     const attributeByUri: IAttributeByKey = keyBy(attributes, (item) => item.attribute.meta.uri!);
     const attributeById: IAttributeByKey = keyBy(attributes, (item) => item.attribute.meta.identifier!);
-    const displayFormByUri: IDisplayFormByKey = keyBy(unwrappedDisplayForms, (item) => item.meta.uri!);
-    const displayFormById: IDisplayFormByKey = keyBy(unwrappedDisplayForms, (item) => item.meta.identifier!);
+    const displayFormByUri: IDisplayFormByKey = keyBy(displayForms, (item) => item.meta.uri!);
+    const displayFormById: IDisplayFormByKey = keyBy(displayForms, (item) => item.meta.identifier!);
 
     const attributeByDisplayFormUri = Object.keys(displayFormByUri).reduce(
         (acc: IAttributeByKey, displayFormUri) => {

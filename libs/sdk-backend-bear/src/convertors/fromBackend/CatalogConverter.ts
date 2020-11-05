@@ -38,10 +38,8 @@ const bearItemTypeByCatalogItemType: {
     measure: "metric",
 };
 
-export const convertItemType = (type: CompatibleCatalogItemType): GdcCatalog.CatalogItemType => {
-    const bearItemType = bearItemTypeByCatalogItemType[type];
-    return bearItemType;
-};
+export const convertItemType = (type: CompatibleCatalogItemType): GdcCatalog.CatalogItemType =>
+    bearItemTypeByCatalogItemType[type];
 
 const bearObjectMetaToBearRef = (obj: GdcMetadata.IObjectMeta): ObjRef => uriRef(obj.uri!);
 
@@ -96,6 +94,9 @@ export const convertAttribute = (
     const attrRef = bearCatalogItemToBearRef(attribute);
     const defaultDisplayForm = displayForms[attribute.links.defaultDisplayForm];
     const attributeData = attributes[attribute.identifier];
+    const attributeDisplayForms = attributeData.attribute.content.displayForms.map((displayForm) =>
+        convertDisplayForm(displayForm, attrRef),
+    );
     const geoPinDisplayForms = (attribute.links.geoPinDisplayForms ?? []).map((uri) => displayForms[uri]);
     const groups = bearGroupableCatalogItemToTagRefs(attribute);
     const drillDownStep = attributeData.attribute.content.drillDownStepAttributeDF
@@ -108,6 +109,7 @@ export const convertAttribute = (
                 return a.modify(commonCatalogItemModifications(attribute)).drillDownStep(drillDownStep);
             })
             .defaultDisplayForm(convertDisplayForm(defaultDisplayForm, attrRef))
+            .displayForms(attributeDisplayForms)
             .geoPinDisplayForms(geoPinDisplayForms.map((df) => convertDisplayForm(df, attrRef)))
             .groups(groups),
     );
