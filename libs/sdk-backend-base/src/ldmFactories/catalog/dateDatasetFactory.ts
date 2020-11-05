@@ -59,6 +59,11 @@ export class CatalogDateAttributeBuilder<
         }
         return this;
     }
+
+    public displayForms(displayForms: IAttributeDisplayFormMetadataObject[]): this {
+        this.item.displayForms = displayForms;
+        return this;
+    }
 }
 
 /**

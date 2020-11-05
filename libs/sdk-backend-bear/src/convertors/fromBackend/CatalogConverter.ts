@@ -151,6 +151,9 @@ const convertDateDataSetAttribute = (
     const drillDownStep = attributeData.attribute.content.drillDownStepAttributeDF
         ? uriRef(attributeData.attribute.content.drillDownStepAttributeDF)
         : undefined;
+    const attributeDisplayForms = attributeData.attribute.content.displayForms.map((displayForm) =>
+        convertDisplayForm(displayForm, attributeRef),
+    );
 
     return newCatalogDateAttribute((catalogDa) =>
         catalogDa
@@ -160,6 +163,7 @@ const convertDateDataSetAttribute = (
             .defaultDisplayForm(displayFormRef, (df) =>
                 df.modify(commonMetadataModifications(defaultDisplayFormMeta)),
             )
+            .displayForms(attributeDisplayForms)
             .granularity(dateDatasetAttribute.type),
     );
 };

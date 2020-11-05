@@ -26,6 +26,11 @@ export interface ICatalogDateAttribute {
      * Date attribute default display form metadata object
      */
     defaultDisplayForm: IAttributeDisplayFormMetadataObject;
+
+    /**
+     * All available display forms
+     */
+    displayForms: IAttributeDisplayFormMetadataObject[];
 }
 
 /**
